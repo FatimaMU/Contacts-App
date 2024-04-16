@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ContactDataSource {
     SQLiteDatabase database;
@@ -60,23 +61,93 @@ public class ContactDataSource {
             updatedValues.put("email", c.getEMail());
             updatedValues.put("birthday", String.valueOf(c.getBirthday().getTimeInMillis()));
             didSucceed = database.update("contact", updatedValues, "_id = " + rowID, null) > 0;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return didSucceed;
     }
 
-    public int getLastContact(){
+    public int getLastContact() {
         int lastId;
-        try{
+        try {
             String query = "Select MAX(_id) from contact";
-            Cursor cursor = database.rawQuery(query,null);
+            Cursor cursor = database.rawQuery(query, null);
             cursor.moveToFirst();
             lastId = cursor.getInt(0);
             cursor.close();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             lastId = -1;
         }
         return lastId;
     }
+
+    public ArrayList<String> getContactNames() {
+        ArrayList<String> names = new ArrayList<>();
+        try {
+            String query = "select contactname from contact";
+            Cursor cursor = database.rawQuery(query, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                names.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+            cursor.close();
+        } catch (Exception e) {
+            names = new ArrayList<>();
+        }
+        return names;
+    }
+
+    public ArrayList<Contact> getAllContacts(String sortField, String sortOrder) {
+        String query = "Select * from contact ORDER BY " + sortField + " " + sortOrder;
+        ArrayList<Contact> contacts = new ArrayList<>();
+        try {
+            Cursor cursor = database.rawQuery(query, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Contact c = new Contact();
+                c.setContactID(cursor.getInt(0));
+                c.setContactName(cursor.getString(1));
+                c.setPhoneNumber(cursor.getString(6));
+                cursor.moveToNext();
+                contacts.add(c);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            contacts = new ArrayList<>();
+        }
+        return contacts;
+    }
+
+    public Contact getSpecificContact(int id) {
+        Contact c = new Contact();
+        String query = "SELECT * FROM contact WHERE _id = " + id;
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            c.setContactID(cursor.getInt(0));
+            c.setContactName(cursor.getString(1));
+            c.setStreetAddress(cursor.getString(2));
+            c.setCity(cursor.getString(3));
+            c.setState(cursor.getString(4));
+            c.setZipcode(cursor.getString(5));
+            c.setPhoneNumber(cursor.getString(6));
+            c.setCellNumber(cursor.getString(7));
+            c.setEMail(cursor.getString(8));
+            Calendar birthday = Calendar.getInstance();
+            birthday.setTimeInMillis(Long.parseLong(cursor.getString(9)));
+            c.setBirthday(birthday);
+        }
+        cursor.close();
+        return c;
+    }
+
+    public boolean deleteContact(int id) {
+        boolean deleted;
+        try {
+            deleted = database.delete("contact", "_id=" + id, null) > 0;
+        } catch (Exception e) {
+            deleted = false;
+        }
+        return deleted;
+    }
+
 }

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,9 +40,36 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         initToggleButton();
         setForEditing(false);
         initChangeBirthdayButton();
-        currentContact = new Contact();
+        initContact();
         initTextChangedEvents();
         initSaveButton();
+    }
+
+    private void initContact() {
+        Bundle extra = getIntent().getExtras();
+        if (extra == null) {
+            currentContact = new Contact();
+        } else {
+            int currentId = extra.getInt("contactId");
+            ContactDataSource ds = new ContactDataSource(this);
+            try {
+                ds.open();
+                currentContact = ds.getSpecificContact(currentId);
+                ds.close();
+                nameEditText.setText(currentContact.getContactName());
+                stateEditText.setText(currentContact.getState());
+                addressEditText.setText(currentContact.getStreetAddress());
+                zipEditText.setText(currentContact.getZipcode());
+                cityEditText.setText(currentContact.getCity());
+                emaiEditText.setText(currentContact.getEMail());
+                homeEditText.setText(currentContact.getPhoneNumber());
+                cellEditText.setText(currentContact.getCellNumber());
+                birthdayText.setText(DateFormat.format("dd/MM/yyyy",
+                        currentContact.getBirthday().getTimeInMillis()).toString());
+            } catch (Exception e) {
+                Toast.makeText(this, "Error Loading Data", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void initSaveButton() {
@@ -54,14 +82,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     dataSource.open();
                     if (currentContact.getContactID() == -1) {
                         wasSuccessful = dataSource.insertContact(currentContact);
-                        if(wasSuccessful){
+                        if (wasSuccessful) {
                             int newId = dataSource.getLastContact();
                             currentContact.setContactID(newId);
                         }
                     } else {
                         wasSuccessful = dataSource.updateContact(currentContact);
                     }
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
                 if (wasSuccessful) {
                     editToggle.toggle();
