@@ -1,5 +1,7 @@
 package com.example.contacts;
 
+import android.graphics.Bitmap;
+
 import java.util.Calendar;
 
 public class Contact {
@@ -13,6 +15,8 @@ public class Contact {
     private String cellNumber;
     private String eMail;
     private Calendar birthday;
+
+    private Bitmap contactPhoto;
 
     public Contact() {
         contactID = -1;
@@ -87,6 +91,10 @@ public class Contact {
         return eMail;
     }
 
+    public void setEMail(String eMail) {
+        this.eMail = eMail;
+    }
+
     public Calendar getBirthday() {
         return birthday;
     }
@@ -95,7 +103,11 @@ public class Contact {
         this.birthday = birthday;
     }
 
-    public void setEMail(String eMail) {
-        this.eMail = eMail;
+    public Bitmap getContactPhoto() {
+        return contactPhoto;
+    }
+
+    public void setContactPhoto(Bitmap contactPhoto) {
+        this.contactPhoto = contactPhoto;
     }
 }
