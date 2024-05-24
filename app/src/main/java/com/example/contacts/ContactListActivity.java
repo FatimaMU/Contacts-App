@@ -82,6 +82,7 @@ public class ContactListActivity extends AppCompatActivity {
             else{
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
+                this.finish();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Error Retrieving Data"

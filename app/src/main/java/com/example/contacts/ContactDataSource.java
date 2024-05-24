@@ -123,6 +123,10 @@ public class ContactDataSource {
                 Contact c = new Contact();
                 c.setContactID(cursor.getInt(0));
                 c.setContactName(cursor.getString(1));
+                c.setStreetAddress(cursor.getString(2));
+                c.setCity(cursor.getString(3));
+                c.setState(cursor.getString(4));
+                c.setZipcode(cursor.getString(5));
                 c.setPhoneNumber(cursor.getString(6));
                 cursor.moveToNext();
                 contacts.add(c);
